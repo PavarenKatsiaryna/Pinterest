@@ -590,6 +590,9 @@ if ((0, _boardsJs.Boards).getMainBoard().length == 0) (0, _remoteJs.getCards)().
     (0, _boardsJs.Boards).setMainBoard(cards);
 });
 else (0, _headerJs.createCardsGrid)((0, _boardsJs.Boards).getMainBoard());
+ //Данный код проверяет наличие данных (карточек) на основной доске.
+ // Если данных нет, он загружает их асинхронно, отображает и сохраняет
+ // их в локальное хранилище. Если данные уже есть, он просто отображает их.
 
 },{"./boards.js":"aLNvh","./remote.js":"jmspP","./header.js":"5C8fu"}],"aLNvh":[function(require,module,exports) {
 //=====================
@@ -1291,6 +1294,6 @@ const getRandomArrayElement = function(array) {
     return array[Math.floor(Math.random() * array.length)];
 };
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}]},["jU1rT","3LleC"], "3LleC", "parcelRequired18d")
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}]},["jU1rT","3LleC"], "3LleC", "parcelRequiread0c")
 
 //# sourceMappingURL=index.e668ad24.js.map
