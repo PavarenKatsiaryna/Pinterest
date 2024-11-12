@@ -1,0 +1,634 @@
+$color_1: #212529;
+$color_2: #fff;
+$color_3: #da2626;
+$color_4: black;
+$color_5: #f9f9f9;
+$color_6: white;
+$color_7: #bdbdbd;
+$font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
+$font-size: 16px;
+
+/*----------- обнуление стилей ---------------*/
+*,
+*::before,
+*::after {
+  padding: 0;
+  margin: 0;
+  border: 0;
+  box-sizing: border-box;
+}
+a {
+  text-decoration: none;
+}
+img {
+  vertical-align: top;
+}
+html,
+body {
+  height: 100%;
+  font-size: $font-size;
+}
+input[type="text"] {
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+  margin: 0;
+}
+/*-------------- header ------------------*/
+.header__container {
+  width: 90%;
+  margin: 0 auto;
+}
+.navigation {
+  display: flex;
+  justify-content: center;
+  height: 100%;
+  margin: 20px 0;
+}
+.link__nav {
+  width: clamp(50px, 7vw, 60px);
+  height: clamp(50px, 7vw, 60px);
+}
+.link__nav-text {
+  display: none;
+}
+.link__img {
+  width: clamp(50px, 7vw, 60px);
+  height: clamp(50px, 7vw, 60px);
+}
+.navigation__input {
+  min-width: clamp(250px, 52vw, 1300px);
+  height: clamp(30px, 7vw, 40px);
+  border: 1px solid $color_7;
+  border-radius: 7px;
+  margin-right: clamp(10px, 1.2vw, 30px);
+  font-family: $font-family;
+  font-size: $font-size;
+}
+.div__input-icon {
+  position: relative;
+  padding-left: clamp(10px, 1.2vw, 30px);
+  align-items: center;
+  display: flex;
+}
+.div__input-icon .navigation__input {
+  padding-left: 15px;
+}
+.navigation__input:focus {
+  outline: 0;
+  outline-offset: 0;
+  color: $color_1;
+  border: 1px solid $color_1;
+  box-shadow: 0 0 10px 5px rgba(221, 221, 221, 1);
+  cursor: pointer;
+}
+/*------- button ---------*/
+.div__button {
+  width: 150px;
+  height: 50px;
+  display: block;
+  font-family: $font-family;
+  font-size: $font-size;
+  border-radius: 50%;
+  text-align: center;
+  position: relative;
+  padding-top: 15px;
+  background: $color_7;
+}
+.button-boards {
+  color: $color_1;
+}
+.button-boards_span {
+  position: relative;
+  z-index: 2;
+}
+.button-boards::after {
+  position: absolute;
+  content: "";
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 100%;
+  background: $color_3;
+  border-radius: 50%;
+}
+
+.button-boards:hover {
+  color: $color_2;
+}
+.button-boards:hover::after {
+  width: 100%;
+}
+/*---------- main ------------*/
+.main__container {
+  column-gap: 10px;
+  width: 90%;
+  margin: 20px auto;
+  column-width: 200px;
+  max-width: 1400px;
+}
+.card {
+  box-shadow: 0px 4px 7px rgba(34, 25, 25, 0.3);
+  background: #fefefe;
+  border: 2px solid #fcfcfc;
+  display: inline-block;
+  margin: 0px 2px 15px;
+  padding: 10px;
+  border-radius: 7px;
+  position: relative;
+  overflow: hidden;
+}
+.card-content {
+  display: flex;
+  align-items: center;
+}
+.card-picture {
+  width: 100%;
+  margin-bottom: 5px;
+  border-bottom: 1px solid $color_7;
+  border-radius: 7px;
+  object-fit: cover;
+}
+.card-hashtag {
+  font-family: $font-family;
+  font-size: 20px;
+  margin: 10px 0;
+  color: $color_3;
+  text-shadow: -1px -1px rgb(247, 154, 154);
+}
+.card-avatar {
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  margin: 10px 5px;
+}
+/*------ модальное окно с выбором досок при клике на кнопку -------*/
+.Boards__menu {
+  display: none;
+  position: absolute;
+  background-color: $color_5;
+  min-width: clamp(85px, 23vw, 150px);
+  border-radius: 7px;
+  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+  z-index: 1;
+  margin-top: 16px;
+  cursor: pointer;
+  font-family: $font-family;
+}
+.Boards__menu.active {
+  color: $color_4;
+  text-decoration: none;
+  display: block;
+  text-align: center;
+}
+.Boards__menu.active :hover {
+  color: $color_5;
+  background-color: $color_3;
+  border-radius: 7px;
+}
+.Boards__menu.active .Boards__item {
+  padding: 12px 16px;
+  display: block;
+}
+/*-- модальное окно с кнопками "добавить на доску", "пожаловаться" --*/
+.pin-menu {
+  position: absolute;
+  top: 0;
+  left: 0;
+  background-color: rgba(128, 128, 128, 0.63);
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+.card:hover .pin-menu {
+  opacity: 1;
+}
+.pin-menu__button {
+  margin-bottom: 15px;
+  display: block;
+  width: 150px;
+  height: 50px;
+  font-family: $font-family;
+  font-size: $font-size;
+  color: $color_6;
+  border-radius: 50%;
+  text-align: center;
+  background: $color_3;
+}
+.pin-menu__button:hover {
+  cursor: pointer;
+}
+/*------ модальное окно "добавить на доску" ------*/
+.modal-add {
+  position: fixed;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  top: 0;
+  left: 0;
+  z-index: 11;
+}
+.modal-add__container {
+  min-height: 100%;
+  max-width: 800px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 30px 10px;
+}
+.modal-add__boards {
+  background-color: $color_6;
+  color: $color_4;
+  width: 500px;
+  padding: 30px;
+  border-radius: 7px;
+  font-family: $font-family;
+}
+.modal-add__title {
+  font-size: clamp(20px, 7vw, 40px);
+  font-weight: 700;
+  margin: 0px 0px 40px 0px;
+  text-align: center;
+}
+.modal-add__list {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 40px;
+}
+.list__item {
+  color: $color_1;
+  font-size: clamp(20px, 4vw, 30px);
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+  text-align: center;
+  font-family: $font-family;
+}
+.list__item:hover {
+  color: $color_3;
+}
+.modal-add__footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+.modal-add__close {
+  color: $color_1;
+  width: 150px;
+  height: 50px;
+  text-align: center;
+  font-size: $font-size;
+  border-radius: 50%;
+  font-family: $font-family;
+  cursor: pointer;
+}
+.modal-add__close:hover {
+  color: $color_2;
+  background: $color_3;
+  border-radius: 50%;
+}
+/*------ модальное окно "жалоба на пин" ------*/
+.modal {
+  position: fixed;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  top: 0;
+  left: 0;
+  z-index: 12;
+}
+.modal_body {
+  min-height: 100%;
+  max-width: 600px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px 10px;
+  position: relative;
+}
+.modal_content {
+  background-color: $color_6;
+  color: $color_4;
+  width: 600px;
+  padding: 30px;
+  border-radius: 7px;
+}
+.modal_title {
+  font-size: clamp(20px, 7vw, 40px);
+  font-weight: 700;
+  margin: 0px 0px 50px 0px;
+  text-align: center;
+  font-family: $font-family;
+}
+.modal_text {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 50px;
+}
+.modal_label {
+  cursor: pointer;
+  display: flex;
+  font-size: 18px;
+  flex-direction: row-reverse;
+  align-items: center;
+  justify-content: flex-end;
+  margin-bottom: 30px;
+  margin-left: 30px;
+  font-family: $font-family;
+}
+.modal_checkbox {
+  width: 0;
+  height: 0;
+  position: absolute;
+  z-index: -1;
+  opacity: 0;
+}
+.modal_checkbox:focus + .modal_span {
+  box-shadow: 0 0 0 1px $color_3, 0 0 10px $color_3;
+}
+.modal_span {
+  display: inline-block;
+  position: relative;
+  width: 20px;
+  height: 20px;
+  border: 1px solid #3d3b3b;
+  background: $color_6;
+  vertical-align: sub;
+  border-radius: 17px;
+  margin-right: 20px;
+}
+.modal_span::before {
+  content: "";
+  display: inline-block;
+  position: absolute;
+  z-index: 10;
+  top: 15%;
+  left: 30%;
+  width: 5px;
+  height: 10px;
+  border: 1px solid $color_3;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg) scale(0);
+}
+.modal_checkbox:checked + .modal_span::before {
+  transform: rotate(45deg) scale(1);
+}
+.modal_footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+.modal_close {
+  width: 150px;
+  height: 50px;
+  text-align: center;
+  font-size: $font-size;
+  border-radius: 50%;
+  cursor: pointer;
+  font-family: $font-family;
+}
+/*------ кнопка "отправить" + срабатывает спиннер при клике ------*/
+.modal_submit {
+  width: 150px;
+  height: 50px;
+  text-align: center;
+  font-size: $font-size;
+  border-radius: 50%;
+  margin-left: 20px;
+  font-family: $font-family;
+  overflow: hidden;
+}
+.modal_submit:hover {
+  background: $color_3;
+  color: $color_2;
+  cursor: pointer;
+}
+.spin.spinner::before {
+  content: "";
+  width: 30px;
+  height: 30px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  border-radius: 50%;
+  border: solid 0.35em #f2adad;
+  border-bottom-color: $color_3;
+  animation: 0.5s linear infinite spinner;
+  transform: translate(-50%, -50%);
+  will-change: transform;
+}
+@keyframes spinner {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+.modal_close:hover {
+  color: $color_2;
+  background: $color_3;
+  border-radius: 50%;
+}
+@media screen and (max-width: 690px) {
+  .main__container {
+    column-gap: 7px;
+    margin: 10px auto;
+    column-width: 170px;
+    width: 98%;
+  }
+}
+@media screen and (max-width: 630px) {
+  .main__container {
+    column-width: 160px;
+  }
+  .navigation {
+    flex-direction: column;
+    margin-left: 15px;
+  }
+  .link__nav {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  .link__nav-text {
+    display: block;
+    order: 1;
+    font-size: 30px;
+    font-weight: 700;
+    color: $color_3;
+    margin-left: 5px;
+    font-family: $font-family;
+  }
+  .div__input-icon {
+    padding-left: 0;
+  }
+  .navigation__input {
+    margin-right: 2px;
+    min-width: clamp(200px, 70vw, 550px);
+    height: clamp(35px, 7vw, 40px);
+  }
+  /*------- burger-menu вместо кнопки  ------*/
+  .div__button {
+    width: 40px;
+    height: 26px;
+    background: $color_2;
+    padding-top: 18px;
+    margin-left: 7px;
+  }
+  .button-boards {
+    position: relative;
+    display: block;
+    width: 25px;
+  }
+  .button-boards_span {
+    display: none;
+  }
+  .button-boards::before,
+  .button-boards::after {
+    content: "";
+    width: 100%;
+    height: 4px;
+    position: absolute;
+    left: 0;
+    display: block;
+    border-radius: 10px;
+  }
+  .button-boards::before {
+    top: -8px;
+    box-shadow: 0 -8px 0 $color_3;
+    background: $color_3;
+  }
+  .button-boards::after {
+    bottom: 0;
+    background: $color_3;
+  }
+  .button-boards::before {
+    transition: box-shadow 0.3s 0.15s, top 0.3s 0.15s, transform 0.3s;
+  }
+  .button-boards::after {
+    transition: bottom 0.3s 0.15s, transform 0.3s;
+  }
+  .button-boards.active-burger::before {
+    top: -8px;
+    transform: rotate(45deg);
+    box-shadow: 0 4px 0 rgba(0, 0, 0, 0);
+    transition: box-shadow 0.15s, top 0.3s, transform 0.3s 0.15s;
+  }
+  .button-boards.active-burger::after {
+    transform: rotate(-45deg);
+    box-shadow: 0 6px 0 rgba(0, 0, 0, 0);
+    transition: bottom 0.3s, transform 0.3s 0.15s;
+    top: -8px;
+  }
+  /*------ модальное окно "пожаловаться" --------*/
+  .Boards__menu {
+    margin-left: -26px;
+    min-width: clamp(75px, 18vw, 100px);
+    margin-top: 15px;
+  }
+  .Boards__menu.active .Boards__item {
+    padding: 6px 2px;
+  }
+  .modal_body {
+    width: 450px;
+  }
+  .modal_content {
+    width: 450px;
+    padding: 15px;
+  }
+  .modal_span {
+    margin-right: 10px;
+  }
+  .modal_footer {
+    justify-content: center;
+    padding-top: 5px;
+  }
+  /*--------- модальное окно "добавить на доску" ---------*/
+  .modal-add__container {
+    width: 400px;
+  }
+  .modal-add__boards {
+    width: 400px;
+    padding: 15px;
+  }
+}
+@media screen and (max-width: 610px) {
+  .main__container {
+    margin: 15px auto;
+    column-width: 200px;
+    width: 92%;
+  }
+  .card {
+    margin: 0px 5px 15px;
+  }
+  /*------ модальное окно "пожаловаться" --------*/
+  .modal_body {
+    width: 350px;
+  }
+  .modal_content {
+    width: 350px;
+  }
+  .modal_title {
+    margin-bottom: 30px;
+  }
+  .modal_text {
+    margin-bottom: 10px;
+  }
+  .modal_label {
+    font-size: $font-size;
+    margin-bottom: 15px;
+    margin-left: 15px;
+  }
+  .modal_span {
+    margin-right: 5px;
+  }
+  /*--------- модальное окно "довавить на доску" ---------*/
+  .modal-add__container {
+    width: 300px;
+  }
+  .modal-add__boards {
+    width: 300px;
+  }
+  .modal-add__title {
+    margin-bottom: 20px;
+  }
+  .modal-add__list {
+    margin-bottom: 15px;
+  }
+}
+@media screen and (max-width: 455px) {
+  .main__container {
+    margin: 10px auto;
+    column-width: 170px;
+    width: 96%;
+  }
+  .card {
+    margin: 0px 2px 15px;
+  }
+}
+@media screen and (max-width: 375px) {
+  .main__container {
+    margin: 10px auto;
+    column-width: 170px;
+    width: 84%;
+  }
+  /*--------- модальное окно "пожаловаться" ---------*/
+  .modal_body {
+    width: 310px;
+  }
+  .modal_content {
+    width: 310px;
+  }
+}
