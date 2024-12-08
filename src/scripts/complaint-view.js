@@ -83,14 +83,28 @@ function createComplaintWindow(parent) {
 
   const buttonSubmit = createElement({
     tag: "button",
-    className: ["modal_submit"],
+    className: ["modal_submit", "disabled"],
     text: "Отправить",
     place: footer,
   });
+  buttonSubmit.disabled = "true";
+
   const buttonSubmitSpinner = createElement({
     tag: "span",
     className: ["spinner"],
     place: buttonSubmit,
+  });
+  //При нажатии на чекбокс кнопка отправить становиться активной
+  const checkboxes = document.querySelectorAll(".modal_checkbox");
+  checkboxes.forEach((checkbox) => {
+    checkbox.addEventListener("change", () => {
+      // Проверяем, есть ли хотя бы один выбранный чекбокс
+      const isChecked = Array.from(checkboxes).some(
+        (checkbox) => checkbox.checked
+      );
+      buttonSubmit.disabled = !isChecked; // Активируем/деактивируем кнопку
+      buttonSubmit.classList.toggle("disabled", !isChecked); // Меняем класс для стилей
+    });
   });
 
   // При нажатии на кнопку "отмена", закрыть и удалить модальное окно

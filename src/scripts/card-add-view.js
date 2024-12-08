@@ -23,11 +23,7 @@ function createBoardsOptions(parent, card, nameBoards) {
         Boards.getMainBoard().splice(index, 1);
         Boards.addCardToBoard(card.data, j);
       }
-//удаляет html элемент карточки
-      if (card.view) {
-        card.view.remove();
-        card.view = null;
-      }
+
     });
   }
 }

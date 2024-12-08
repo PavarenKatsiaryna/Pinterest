@@ -1,5 +1,3 @@
-//=====================
-// Переменные
 
 const boards = {
   0: [], //CardArray
@@ -10,7 +8,6 @@ const boards = {
 
 let activeBoardIndex = 0;
 
-//=====================
 // Методы
 
 function getMainBoard() {
@@ -32,14 +29,28 @@ function setToLocalStorage(array, name) {
   localStorage.setItem(name, JSON.stringify(array));
 }
 
-/**
- * Добавляет карточку на выбранную доску
- */
+// Добавляет карточку на выбранную доску
+  
 function addCardToBoard(cardData, boardIndex) {
   boards[boardIndex].push(cardData);
   setToLocalStorage(boards[0], "cardArray");
   setToLocalStorage(boards[boardIndex], `cardArrayBoard${boardIndex}`);
 }
+function removeCardFromBoard(cardObj, boardIndex) {
+  const boardCards = boards[boardIndex];
+  // Ищем индекс карточки с указанным ID
+  const cardIndex = boardCards.findIndex(card => card.id === cardObj.data.id);
+  // Если карточка найдена, удаляем её
+  if (cardIndex !== -1) {
+    cardObj.view.remove();
+    cardObj.view = null;
+    boardCards.splice(cardIndex, 1);
+    setToLocalStorage(boards[0], "cardArray");
+    setToLocalStorage(boardCards, `cardArrayBoard${boardIndex}`);
+    
+  }
+}
+
 
 function getActive() {
   return activeBoardIndex;
@@ -58,6 +69,7 @@ const Boards = {
   setActive,
   getMainBoard,
   setMainBoard,
+  removeCardFromBoard,
 };
 
 export { Boards };

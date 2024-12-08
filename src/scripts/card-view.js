@@ -2,6 +2,8 @@ import { createElement, createButtonElement } from "./elements.js";
 import { createModalAdd } from "./card-add-view.js";
 import { createComplaintWindow } from "./complaint-view.js";
 import { getRandomArrayElement } from "./utils.js";
+import { Boards } from './boards.js'
+
 
 const heights = [200, 260, 280, 300, 240];
 
@@ -53,6 +55,9 @@ function createPinView(cardObj) {
     className: ["pin-menu"],
     place: cardObj.view,
   });
+  const boards = Boards;
+  const card = cardObj;
+  const bid = Boards.getActive();
 
   const buttonAdd = createButtonElement(
     "Добавить на доску",
@@ -66,7 +71,23 @@ function createPinView(cardObj) {
     "button-complain",
     pin
   );
-
+  const buttonDelete = createButtonElement(
+    "Удалить с доски",
+    "pin-menu__button",
+    "button-delete",
+    pin
+  );
+ // Проверяем, является ли текущая доска одной из целевых (1, 2 или 3)
+ if ([1, 2, 3].includes(bid)) {
+  // Если это одна из целевых досок, меняем местами кнопки
+  buttonAdd.style.display = 'none';
+  buttonDelete.style.display = 'block';
+} else {
+  // В противном случае оставляем стандартное поведение
+  buttonAdd.style.display = 'block';
+  buttonDelete.style.display = 'none';
+}
+  
   //--------- Открытие окна добавления карточки ---------
   buttonAdd.addEventListener("click", () => {
     createModalAdd(document.querySelector("#root"), cardObj);
@@ -76,6 +97,10 @@ function createPinView(cardObj) {
   buttonComplain.addEventListener("click", () => {
     createComplaintWindow(document.querySelector("#root"));
   });
+  //----------- Удаление карточки с доски -----------
+  buttonDelete.addEventListener("click", () => {
+    boards.removeCardFromBoard(card, bid)
+  });
 
   cardObj.view.addEventListener("mouseover", function () {
     pin.style.display = "flex";
@@ -84,6 +109,7 @@ function createPinView(cardObj) {
   cardObj.view.addEventListener("mouseout", function () {
     pin.style.display = "none";
   });
+  
 }
 
 export { createCardView, createPinView };

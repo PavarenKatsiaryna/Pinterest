@@ -8,14 +8,23 @@ import { createCardView, createPinView } from "./card-view.js";
 
 function searchByLetters(searchTerm, cards) {
   return cards.filter((card) =>
-    card.hashtag.toLowerCase().includes(searchTerm)
+    card.hashtag.toLowerCase().includes(searchTerm.toLowerCase())
   );
 }
 
 function updateSearchResults(results) {
   let main = document.querySelector("main");
-  main.remove();
-  createCardsGrid(results);
+  main.innerHTML = ""; // Очищаем содержимое main
+
+  if (results.length === 0) {
+    // Если результаты пусты, добавляем картинку
+    let message = document.createElement("div");
+    message.className = "not_found" 
+    main.appendChild(message);
+  } else {
+    // Если есть результаты, создаем карточки
+    createCardsGrid(results);
+  }
 }
 
 // Создает строку поиска
@@ -176,9 +185,8 @@ function createHeader() {
   createBoardsDropdown(divButton);
 }
 
-/**
- * Создает список доступных досок
- */
+// Создает список доступных досок
+ 
 function createBoardsOptions(parent, cardData, nameBoards) {
   for (let j = 1; j <= nameBoards.length; j++) {
     const linkBoard = createElement({
@@ -220,7 +228,7 @@ function createCardsGrid(cards) {
     className: ["main__container"],
     place: main,
   });
-
+  
   for (const cardData of cards) {
     const card = { data: cardData };
     card.view = createCardView(card);

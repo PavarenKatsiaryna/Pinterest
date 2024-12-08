@@ -595,8 +595,6 @@ else (0, _headerJs.createCardsGrid)((0, _boardsJs.Boards).getMainBoard());
  // их в локальное хранилище. Если данные уже есть, он просто отображает их.
 
 },{"./boards.js":"aLNvh","./remote.js":"jmspP","./header.js":"5C8fu"}],"aLNvh":[function(require,module,exports) {
-//=====================
-// Переменные
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "Boards", ()=>Boards);
@@ -607,7 +605,6 @@ const boards = {
     3: []
 };
 let activeBoardIndex = 0;
-//=====================
 // Методы
 function getMainBoard() {
     return boards[0];
@@ -624,12 +621,24 @@ function getFromLocalStorage() {
 function setToLocalStorage(array, name) {
     localStorage.setItem(name, JSON.stringify(array));
 }
-/**
- * Добавляет карточку на выбранную доску
- */ function addCardToBoard(cardData, boardIndex) {
+// Добавляет карточку на выбранную доску
+function addCardToBoard(cardData, boardIndex) {
     boards[boardIndex].push(cardData);
     setToLocalStorage(boards[0], "cardArray");
     setToLocalStorage(boards[boardIndex], `cardArrayBoard${boardIndex}`);
+}
+function removeCardFromBoard(cardObj, boardIndex) {
+    const boardCards = boards[boardIndex];
+    // Ищем индекс карточки с указанным ID
+    const cardIndex = boardCards.findIndex((card)=>card.id === cardObj.data.id);
+    // Если карточка найдена, удаляем её
+    if (cardIndex !== -1) {
+        cardObj.view.remove();
+        cardObj.view = null;
+        boardCards.splice(cardIndex, 1);
+        setToLocalStorage(boards[0], "cardArray");
+        setToLocalStorage(boardCards, `cardArrayBoard${boardIndex}`);
+    }
 }
 function getActive() {
     return activeBoardIndex;
@@ -645,7 +654,8 @@ const Boards = {
     getActive,
     setActive,
     getMainBoard,
-    setMainBoard
+    setMainBoard,
+    removeCardFromBoard
 };
 
 },{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"gkKU3":[function(require,module,exports) {
@@ -683,7 +693,7 @@ var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "getCards", ()=>getCards);
 async function getCards() {
-    const response = await fetch("https://65d85342c96fbb24c1bb40ab.mockapi.io/api/pintrest/PinterestClone");
+    const response = await fetch("https://67376867aafa2ef22233bb01.mockapi.io/el/Pinterest");
     return await response.json();
 }
 
@@ -698,11 +708,17 @@ var _cardViewJs = require("./card-view.js");
 //=================================
 // Заголовок страницы
 function searchByLetters(searchTerm, cards) {
-    return cards.filter((card)=>card.hashtag.toLowerCase().includes(searchTerm));
+    return cards.filter((card)=>card.hashtag.toLowerCase().includes(searchTerm.toLowerCase()));
 }
 function updateSearchResults(results) {
     let main = document.querySelector("main");
-    main.remove();
+    main.innerHTML = ""; // Очищаем содержимое main
+    if (results.length === 0) {
+        // Если результаты пусты, добавляем картинку
+        let message = document.createElement("div");
+        message.className = "not_found";
+        main.appendChild(message);
+    } else // Если есть результаты, создаем карточки
     createCardsGrid(results);
 }
 // Создает строку поиска
@@ -874,9 +890,8 @@ function createHeader() {
     });
     createBoardsDropdown(divButton);
 }
-/**
- * Создает список доступных досок
- */ function createBoardsOptions(parent, cardData, nameBoards) {
+// Создает список доступных досок
+function createBoardsOptions(parent, cardData, nameBoards) {
     for(let j = 1; j <= nameBoards.length; j++){
         const linkBoard = (0, _elementsJs.createElement)({
             tag: "a",
@@ -970,6 +985,7 @@ var _elementsJs = require("./elements.js");
 var _cardAddViewJs = require("./card-add-view.js");
 var _complaintViewJs = require("./complaint-view.js");
 var _utilsJs = require("./utils.js");
+var _boardsJs = require("./boards.js");
 const heights = [
     200,
     260,
@@ -1033,8 +1049,26 @@ function createPinView(cardObj) {
         ],
         place: cardObj.view
     });
+    const boards = (0, _boardsJs.Boards);
+    const card = cardObj;
+    const bid = (0, _boardsJs.Boards).getActive();
     const buttonAdd = (0, _elementsJs.createButtonElement)("\u0414\u043E\u0431\u0430\u0432\u0438\u0442\u044C \u043D\u0430 \u0434\u043E\u0441\u043A\u0443", "pin-menu__button", "button-add", pin);
     const buttonComplain = (0, _elementsJs.createButtonElement)("\u041F\u043E\u0436\u0430\u043B\u043E\u0432\u0430\u0442\u044C\u0441\u044F", "pin-menu__button", "button-complain", pin);
+    const buttonDelete = (0, _elementsJs.createButtonElement)("\u0423\u0434\u0430\u043B\u0438\u0442\u044C \u0441 \u0434\u043E\u0441\u043A\u0438", "pin-menu__button", "button-delete", pin);
+    // Проверяем, является ли текущая доска одной из целевых (1, 2 или 3)
+    if ([
+        1,
+        2,
+        3
+    ].includes(bid)) {
+        // Если это одна из целевых досок, меняем местами кнопки
+        buttonAdd.style.display = "none";
+        buttonDelete.style.display = "block";
+    } else {
+        // В противном случае оставляем стандартное поведение
+        buttonAdd.style.display = "block";
+        buttonDelete.style.display = "none";
+    }
     //--------- Открытие окна добавления карточки ---------
     buttonAdd.addEventListener("click", ()=>{
         (0, _cardAddViewJs.createModalAdd)(document.querySelector("#root"), cardObj);
@@ -1042,6 +1076,10 @@ function createPinView(cardObj) {
     //----------- Открытие окна жалоб -----------
     buttonComplain.addEventListener("click", ()=>{
         (0, _complaintViewJs.createComplaintWindow)(document.querySelector("#root"));
+    });
+    //----------- Удаление карточки с доски -----------
+    buttonDelete.addEventListener("click", ()=>{
+        boards.removeCardFromBoard(card, bid);
     });
     cardObj.view.addEventListener("mouseover", function() {
         pin.style.display = "flex";
@@ -1051,7 +1089,7 @@ function createPinView(cardObj) {
     });
 }
 
-},{"./elements.js":"kF6BV","./card-add-view.js":"7gUP2","./complaint-view.js":"bjlFa","./utils.js":"bVlgj","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"7gUP2":[function(require,module,exports) {
+},{"./elements.js":"kF6BV","./card-add-view.js":"7gUP2","./complaint-view.js":"bjlFa","./utils.js":"bVlgj","./boards.js":"aLNvh","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"7gUP2":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "createModalAdd", ()=>createModalAdd);
@@ -1079,11 +1117,6 @@ function createBoardsOptions(parent, card, nameBoards) {
             if (index !== -1) {
                 (0, _boardsJs.Boards).getMainBoard().splice(index, 1);
                 (0, _boardsJs.Boards).addCardToBoard(card.data, j);
-            }
-            //удаляет html элемент карточки
-            if (card.view) {
-                card.view.remove();
-                card.view = null;
             }
         });
     }
@@ -1247,17 +1280,29 @@ function createComplaintWindow(parent) {
     const buttonSubmit = (0, _elementsJs.createElement)({
         tag: "button",
         className: [
-            "modal_submit"
+            "modal_submit",
+            "disabled"
         ],
         text: "\u041E\u0442\u043F\u0440\u0430\u0432\u0438\u0442\u044C",
         place: footer
     });
+    buttonSubmit.disabled = "true";
     const buttonSubmitSpinner = (0, _elementsJs.createElement)({
         tag: "span",
         className: [
             "spinner"
         ],
         place: buttonSubmit
+    });
+    //При нажатии на чекбокс кнопка отправить становиться активной
+    const checkboxes = document.querySelectorAll(".modal_checkbox");
+    checkboxes.forEach((checkbox)=>{
+        checkbox.addEventListener("change", ()=>{
+            // Проверяем, есть ли хотя бы один выбранный чекбокс
+            const isChecked = Array.from(checkboxes).some((checkbox)=>checkbox.checked);
+            buttonSubmit.disabled = !isChecked; // Активируем/деактивируем кнопку
+            buttonSubmit.classList.toggle("disabled", !isChecked); // Меняем класс для стилей
+        });
     });
     // При нажатии на кнопку "отмена", закрыть и удалить модальное окно
     buttonClose.addEventListener("click", ()=>{
@@ -1290,10 +1335,56 @@ function createComplaintWindow(parent) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "getRandomArrayElement", ()=>getRandomArrayElement);
+var _buttonScroll = require("./button-scroll");
 const getRandomArrayElement = function(array) {
     return array[Math.floor(Math.random() * array.length)];
 };
+//вызов кнопки scroll
+(0, _buttonScroll.buttonScrolling)(document.querySelector("#root"));
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}]},["jU1rT","3LleC"], "3LleC", "parcelRequiread0c")
+},{"./button-scroll":"1UYUT","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"1UYUT":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "buttonScrolling", ()=>buttonScrolling);
+var _elements = require("./elements");
+// Кнопка наверх для прокрутки страницы сайта в начало
+function buttonScrolling(parent) {
+    const rootDiv = document.createElement("div");
+    rootDiv.className = "button-scroll";
+    parent.append(rootDiv);
+    const buttonScrContainer = (0, _elements.createElement)({
+        tag: "div",
+        className: [
+            "btn-up",
+            "btn-up_hide"
+        ],
+        place: rootDiv
+    });
+    const btnUp = {
+        el: buttonScrContainer,
+        show () {
+            this.el.classList.remove("btn-up_hide");
+        },
+        hide () {
+            this.el.classList.add("btn-up_hide");
+        },
+        addEventListener () {
+            window.addEventListener("scroll", ()=>{
+                const scrollY = window.scrollY || document.documentElement.scrollTop;
+                scrollY > 200 ? this.show() : this.hide();
+            });
+            this.el.onclick = ()=>{
+                window.scrollTo({
+                    top: 0,
+                    left: 0,
+                    behavior: "smooth"
+                });
+            };
+        }
+    };
+    btnUp.addEventListener();
+}
+
+},{"./elements":"kF6BV","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}]},["jU1rT","3LleC"], "3LleC", "parcelRequiread0c")
 
 //# sourceMappingURL=index.e668ad24.js.map
